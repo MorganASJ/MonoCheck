@@ -108,7 +108,7 @@ def is_monophyletic(tree, group, taxonomy, leaf_taxon):
     return isMono
 
 # Entry point
-def main():
+def main1():
 
     # Parse arguments python monocheck [tree file] -group [taxonomic group] -outgroup [outgroup file OR outgroup taxon]
     parser = argparse.ArgumentParser(description="Check monophyly of a group in a phylogenetic tree.")
@@ -123,6 +123,8 @@ def main():
     taxonomy=[]
     leaf_names = []
     taxa_list = []
+    trees = []
+
 
     # create tree object from tree
     try:
@@ -229,7 +231,163 @@ def main():
         print("ERROR CALCULATING MONOPHYLY:", err.args[0])
         sys.exit(1)    
 
-if __name__ == "__main__":
-    main()
+
+
+def main():
+
+    # Parse arguments python monocheck [tree file] -group [taxonomic group] -outgroup [outgroup file OR outgroup taxon]
+    parser = argparse.ArgumentParser(description="Check monophyly of a group in a phylogenetic tree.")
+    parser.add_argument("tree", help="Newick file containing the tree")
+    parser.add_argument("-clade", required=True, help="Clade to check for monophyly")
+    parser.add_argument("-outgroup", required=True, help="File containing outgroup taxa (one per line)")
+    parser.add_argument("-taxonomy", required=False, help="File containing taxonomy information")
+    parser.add_argument("--showtree", action=argparse.BooleanOptionalAction, required=False, help="Shows the rooted tree prior to checking for Monophyly of clade")
+    parser.add_argument("--resettaxonomy", action=argparse.BooleanOptionalAction, required=False, help="Resets the taxonomy file by redownloading information from NCBI Taxonomy")
+    args = parser.parse_args()
+
+    taxonomy=[]
+    leaf_names = []
+    taxa_list = []
+    trees = []
+    paths = []
+
+    # get trees from directory file path
+    if os.path.isdir(args.tree):
+        for file in os.listdir(args.tree):
+            # try:
+            print(file)
+            trees.append(Tree(file, format=1))
+            paths.append(file)
+            # except Exception as err:
+            #     print(f"WARNING: File {file} could not be parsed")
+            #     continue
+        print(f'Found {len(trees)} in directory')
+        if len(trees) < 1:
+            print("Exiting...")
+            sys.exit(0)
+    else:
+        # Otherwise get the single tree given
+        try:
+            if not os.path.exists(args.tree):
+                raise Exception(f"Tree file does not exist at path: {args.tree}")
+            trees.append(Tree(args.tree, format=1))
+            paths.append(args.tree)
+        except Exception as err:
+            print("ERROR PROCESSING TREE: ", err.args[0])
+            sys.exit(1)
+
+    # Read outgroup root file
+    if not os.path.exists(args.outgroup):
+        print(f"ERROR PROCESSING OUTGROUP FILE: Outgroup file does not exist at path: {args.outgroup}")
+    
+    for tree in trees:
+        # Try to root
+        try:
+            tree = root_tree(tree, args.outgroup)
+            if args.showtree:
+                print(tree)
+        except:
+            print("ERROR PROCESSING OUTGROUP: Outgroup must be a file containing tip labels as seen on trees")
+            sys.exit(1)
+
+    # Base tree for taxonomy work
+    tree = trees[0]
+
+    # Get tips and leaves
+    try:
+        leaf_names = [leaf.name for leaf in tree.get_leaves()]
+        taxa_list = ["_".join((taxon[0],taxon[1])) for taxon in [taxon.split("_") for taxon in leaf_names]] 
+    except IndexError as err:
+        print("ERROR PROCESSING TIP LABEL: Ensure tip labels are in format Genus_species*")
+        sys.exit(1)
+
+    # Begin taxonomy process
+    if args.taxonomy:
+
+        try:
+            if not os.path.exists(args.taxonomy):
+                raise Exception(f"Taxonomy file does not exist at path: {args.taxonomy}")
+            
+            taxonomy = read_taxonomy(args.taxonomy)
+
+        except Exception as err:
+            print("ERROR READING TAXONOMY FILE:", err.args[0])
+            sys.exit(1)
+
+    else:
+        found = False
+        if not args.resettaxonomy:
+            try:
+                
+                for file in os.listdir():
+                    if file.endswith(".tax"):
+                        if found:
+                            raise Exception("Multiple taxonomy files present")
+                        # print(file)
+                        taxonomy = read_taxonomy(file)
+                        # print(taxonomy)
+                        found = True
+            except Exception as err:
+                print("ERROR SEARCHING FOR TAXONOMY FILE:", err.args[0])
+                sys.exit(1)
+
+        try:
+
+            if not found:
+                # Calculate new taxonomy
+                wrapper = []
+                start_time = time.time()
+                if len(trees) > 1:
+                    ret_taxonomy = threading.Thread(name='retrieve_taxonomy', target=fetch_taxonomy, args=(taxa_list, args.tree + "/taxonomy.tax", wrapper))
+                else:
+                    ret_taxonomy = threading.Thread(name='retrieve_taxonomy', target=fetch_taxonomy, args=(taxa_list,"/taxonomy.tax", wrapper))
+                ret_taxonomy.start()
+                while ret_taxonomy.is_alive():
+                    animated_loading(f' Retriving taxonomy information for {len(taxa_list)} taxa...')
+                
+                sys.stdout.flush()
+                print(f'\rRetrieving taxonomy information from NCBI Taxonomy database took {round(time.time() - start_time,1)} seconds.')
+
+                if not wrapper:
+                    raise Exception("No taxonomy returned by retrieval thread")
+                    
+                taxonomy = wrapper[0]
+
+        except Exception as err:
+            print("ERROR GENERATING TAXONOMY:", err.args[0])
+            sys.exit(1)
+
+    # Check no taxa are missing from taxonomy before proceeding
+    try:
+        missing_taxa = set(taxa_list) - set(taxonomy['Taxon'])
+        if missing_taxa:
+            raise Exception(f"The following taxa are missing: {missing_taxa}")
+    except Exception as err:
+        print("ERROR READING TAXONOMY: ", err.args[0])
+        sys.exit(1)
 
     
+    # Check monophyly
+
+    for t in range(len(trees)):
+        try:
+            tree_leaves = [leaf.name for leaf in trees[t].get_leaves()]
+            if tree_leaves != leaf_names:
+                raise Exception(f"Leaf names are not consistent. Missing expected tips: {tree_leaves - leaf_names}")
+            result = is_monophyletic(trees[t], str.lower(args.clade), taxonomy, leaf_names)
+
+            print(f"{paths[0]}>>> Is {args.clade} monophyletic? {'Yes' if result[0] else 'No'}")
+
+            if not result[0]:
+                print(f'Monophyly is prevented by the inclusion of the following leaves:')
+                for leaf in result[2]:
+                    print(leaf.name)
+
+        except Exception as err:
+            print(f"ERROR CALCULATING MONOPHYLY IN TREE {paths[t]}: {err.args[0]}")
+
+    
+    
+
+if __name__ == "__main__":
+    main()
