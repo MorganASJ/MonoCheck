@@ -254,13 +254,14 @@ def main():
     # get trees from directory file path
     if os.path.isdir(args.tree):
         for file in os.listdir(args.tree):
-            # try:
-            print(file)
-            trees.append(Tree(file, format=1))
-            paths.append(file)
-            # except Exception as err:
-            #     print(f"WARNING: File {file} could not be parsed")
-            #     continue
+            try:
+                print('Reading',file,'...')
+                path = args.tree + '/' + file
+                trees.append(Tree(path, format=1))
+                paths.append(path)
+            except Exception as err:
+                print(f"WARNING: File {file} could not be parsed")
+                continue
         print(f'Found {len(trees)} in directory')
         if len(trees) < 1:
             print("Exiting...")
@@ -278,14 +279,20 @@ def main():
 
     # Read outgroup root file
     if not os.path.exists(args.outgroup):
-        print(f"ERROR PROCESSING OUTGROUP FILE: Outgroup file does not exist at path: {args.outgroup}")
+
+        if os.path.exists(args.tree + "/" + args.outgroup):
+            args.outgroup = args.tree + "/" + args.outgroup
+        else:
+            print(f"ERROR PROCESSING OUTGROUP FILE: Outgroup file does not exist at path: {args.outgroup}")
+            sys.exit(1)
     
-    for tree in trees:
+    for i in range(len(trees)):
         # Try to root
         try:
-            tree = root_tree(tree, args.outgroup)
+            tree = root_tree(trees[i], args.outgroup)
             if args.showtree:
-                print(tree)
+                print(paths[i])
+                print(trees[i])
         except:
             print("ERROR PROCESSING OUTGROUP: Outgroup must be a file containing tip labels as seen on trees")
             sys.exit(1)
@@ -306,6 +313,8 @@ def main():
 
         try:
             if not os.path.exists(args.taxonomy):
+                if os.path.exists(args.tree + '/' + args.taxonomy):
+                    args.taxonomy = args.tree + '/' + args.taxonomy
                 raise Exception(f"Taxonomy file does not exist at path: {args.taxonomy}")
             
             taxonomy = read_taxonomy(args.taxonomy)
@@ -318,13 +327,16 @@ def main():
         found = False
         if not args.resettaxonomy:
             try:
-                
-                for file in os.listdir():
+                if os.path.isdir(args.tree):
+                    path = args.tree + '/'
+                else:
+                    path = '.'
+                for file in os.listdir(path):
                     if file.endswith(".tax"):
                         if found:
                             raise Exception("Multiple taxonomy files present")
                         # print(file)
-                        taxonomy = read_taxonomy(file)
+                        taxonomy = read_taxonomy(path + '/' + file)
                         # print(taxonomy)
                         found = True
             except Exception as err:
@@ -372,8 +384,10 @@ def main():
     for t in range(len(trees)):
         try:
             tree_leaves = [leaf.name for leaf in trees[t].get_leaves()]
-            if tree_leaves != leaf_names:
-                raise Exception(f"Leaf names are not consistent. Missing expected tips: {tree_leaves - leaf_names}")
+            if set(tree_leaves) != set(leaf_names):
+                print(tree_leaves)
+                print(leaf_names)
+                raise Exception(f"Leaf names are not consistent. Missing expected tips: {list(set(tree_leaves) - set(leaf_names))}")
             result = is_monophyletic(trees[t], str.lower(args.clade), taxonomy, leaf_names)
 
             print(f"{paths[0]}>>> Is {args.clade} monophyletic? {'Yes' if result[0] else 'No'}")
