@@ -31,6 +31,8 @@ MonoCheck is run from the terminal and can be used to quickly determine monophyl
 
  - **--resettaxonomy**: Force regeneration of the taxonomy file by querying NCBI. (Optional)
 
+ - **-h**: Shows help information (Optional)
+
 # Requirements
 
 MonoCheck requires **BioPython** for the Entrez libraries, **Pandas** for data frame management, and **ete3** for phylogenetic tree data structures and functions.
