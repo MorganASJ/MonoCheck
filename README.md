@@ -72,7 +72,7 @@ With the outgroup generated, we can run MonoCheck with the test tree. The tree w
 
     $ python3 monocheck.py test_tree.tre -clade Insecta -outgroup outgroup.txt -email myemail@university.ac.uk
 
-Since there is no taxonomy file in the directory MonoCheck will search for the taxonomy records for each taxa in the tree and save the taxonomy file to the working directory. This can take a few seconds and up to a few minutes for larger trees.
+Since there is no taxonomy file in the directory MonoCheck will search for the taxonomy records for each taxa in the tree and save the taxonomy file to the working directory. This can take a few seconds and up to a few minutes for larger trees. If a taxonomy file is already present in the directory MonoCheck will use the one already there. This means for larger trees you will only need to compute the taxonomy once.
 
 Output from this command:
 
@@ -114,7 +114,7 @@ Example:
 
     python3 monocheck.py trees -clade Arthropoda Insecta Diptera -outgroup trees/outgroup.txt -email myemail@university.ac.uk
 
-From this we will get output telling us the state of each of the three clades in each tree:
+after running this command we will get output telling us the state of each of the three clades in each tree:
 
     trees/OG0000138_tree.txt>>> Arthropoda | polyphyletic | 3
     trees/OG0000138_tree.txt>>> Insecta | monophyletic | *
@@ -127,11 +127,14 @@ With so many trees viewing this information in the terminal is not very useful. 
 |Tree|Clade|Status|NumberDisrupting|DisruptingTaxa|
 |---|---|---|---|---|
 |trees/OG0000206_tree.txt|Arthropoda|paraphyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
-|trees/OG0000206_tree.txt|Insecta|paraphyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
+|trees/OG0000206_tree.txt|Insecta|monophyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
 |trees/OG0000206_tree.txt|Diptera|paraphyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
 |trees/OG0000215_tree.txt|Arthropoda|paraphyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
+|trees/OG0000215_tree.txt|Insecta|monophyletic|0|[]|
+|trees/OG0000215_tree.txt|Diptera|monophyletic|0|[]|
+|...|...|...|...|...|
 
-A small script analyse.py shows me stats when the tree_stats.csv is input:
+A small script included in the repo; analyse.py, shows me monophyly stats when the tree_stats.csv is input:
 
     Clade: Arthropoda, Monophyletic: 14, Total: 46, Percentage: 30.43%
     Clade: Insecta, Monophyletic: 38, Total: 46, Percentage: 82.61%
