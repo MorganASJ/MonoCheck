@@ -140,6 +140,10 @@ A small script included in the repo; analyse.py, shows me monophyly stats when t
     Clade: Insecta, Monophyletic: 38, Total: 46, Percentage: 82.61%
     Clade: Diptera, Monophyletic: 41, Total: 46, Percentage: 89.13%
 
+### Error Checking
+
+I have built error recovery into the program. If you are missing an input, or there is an issue with file structure the program should tell you. If there are any issues please feel free to contact me.
+
 ### Library References:
 _Jaime Huerta-Cepas, Francois Serra and Peer Bork._ ETE 3: Reconstruction, analysis and visualization of phylogenomic data. **Mol Biol Evol 2016;**  [doi: 10.1093/molbev/msw046](http://mbe.oxfordjournals.org/content/early/2016/03/21/molbev.msw046 "link to citation reference")
 
