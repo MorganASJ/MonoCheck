@@ -1,0 +1,1 @@
+(Caenorhabditis_elegans:0.502136,(Paramacrobiotus_metropolitanus:1.23218,((Tribolium_castaneum:0.178164,(Aedes_aegypti:0.114212,Drosophila_melanogaster:0.233197)1:0.248567)0.979:0.0835626,(Daphnia_pulex:0.261851,(Limulus_polyphemus:0.32259,Priapulus_caudatus:0.322628)0.986:0.114892)0.86:0.0303487)0.829:0.118756)1:0.502136);

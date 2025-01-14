@@ -273,7 +273,7 @@ def main():
                     raise Exception("No taxonomy returned by retrieval thread")
                 
                 # Inform user how much time it took to retreive taxonomy
-                print(f'Retrieving taxonomy information from NCBI Taxonomy database took {round(time.time() - start_time,1)} seconds.')
+                print(f'\rRetrieving taxonomy information from NCBI Taxonomy database took {round(time.time() - start_time,1)} seconds.')
                 
                 # Set taxonomy to the returned data
                 taxonomy = wrapper[0]
