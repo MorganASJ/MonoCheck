@@ -7,7 +7,7 @@ Entrez.email = ""
 
 #Spinner while taxonomy calculates
 def animated_loading(message):
-    chars = "/—\|" 
+    chars = "/—\\|" 
     for char in chars:
         sys.stdout.write('\r' + char + message)
         time.sleep(.1)
