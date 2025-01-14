@@ -106,13 +106,13 @@ If we provide the `--showtree` flag we will get a print out of the rooted tree:
 
  ### Running MonoCheck on multiple trees
 
-In the directory trees there are a set of orthofinder gene trees for the same taxa as above. If I wanted to check the monophyly of clades within all these trees manually it could take significant time.
+In the directory ./trees/ there are a set of orthofinder gene trees for the same taxa as above. If I wanted to check the monophyly of clades within all these trees manually it could take significant time.
 
 To run MonoCheck on a folder simply type the folder name instead of the tree. Unless given a direct path MonoCheck will check for the outgroup file and taxonomy file in the Working and Tree directory.
 
 Example:
 
-    python3 monocheck.py trees -clade Arthropoda Insecta Diptera -outgroup trees/outgroup.txt -email myemail@university.ac.uk
+    $ python3 monocheck.py trees -clade Arthropoda Insecta Diptera -outgroup trees/outgroup.txt -email myemail@university.ac.uk
 
 after running this command we will get output telling us the state of each of the three clades in each tree:
 
@@ -143,10 +143,25 @@ A small script included in the repo; analyse.py, shows me monophyly stats when t
 ### Error Checking
 
 I have built error recovery into the program. If you are missing an input, or there is an issue with file structure the program should tell you. If there are any issues please feel free to contact me.
+There is a shell script run_everything.sh which will run everything above and place the results in log files.
+
+### Further testing
+
+For a more comprehensive test I have included a modified species tree from [Prum *et al*. 2015](https://github.com/carolinafishes/Prum_et_al_2015) Due to the size of the tree it can take a few minutes to generate taxonomy information therefore I have included the taxonomy file. If you wish to recompute this simply use the --resettaxonomy flag.
+
+An example command would be the following:
+
+    $ python3 monocheck.py ./prum/prum.treefile -clade Charadriiformes Accipitriformes Suliformes Caprimulgidae Procellariidae -outgroup ./prum/outgroup_prum.txt -taxonomy ./prum/taxonomy.tax -out ./prum/output.csv -email user.email@uni.com --showtree
 
 ### Library References:
 _Jaime Huerta-Cepas, Francois Serra and Peer Bork._ ETE 3: Reconstruction, analysis and visualization of phylogenomic data. **Mol Biol Evol 2016;**  [doi: 10.1093/molbev/msw046](http://mbe.oxfordjournals.org/content/early/2016/03/21/molbev.msw046 "link to citation reference")
 
 Peter J. A. Cock, Tiago Antao, Jeffrey T. Chang, Brad A. Chapman, Cymon J. Cox, Andrew Dalke, Iddo Friedberg, Thomas Hamelryck, Frank Kauff, Bartek Wilczynski, Michiel J. L. de Hoon, Biopython: freely available Python tools for computational molecular biology and bioinformatics, _Bioinformatics_, Volume 25, Issue 11, June 2009, Pages 1422–1423, [https://doi.org/10.1093/bioinformatics/btp163](https://doi.org/10.1093/bioinformatics/btp163)
+
+### Publication References:
+
+Prum, R., Berv, J., Dornburg, A. et al. A comprehensive phylogeny of birds (Aves) using targeted next-generation DNA sequencing. Nature 526, 569–573 (2015). https://doi.org/10.1038/nature15697
+
+Emms, D.M., Kelly, S. OrthoFinder: phylogenetic orthology inference for comparative genomics. Genome Biol 20, 238 (2019). https://doi.org/10.1186/s13059-019-1832-y
 
 McKinney, W., & others. (2010). Data structures for statistical computing in python. In _Proceedings of the 9th Python in Science Conference_ (Vol. 445, pp. 51–56).
