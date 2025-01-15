@@ -130,7 +130,7 @@ With so many trees viewing this information in the terminal is not very useful. 
 |Tree|Clade|Status|NumberDisrupting|DisruptingTaxa|
 |---|---|---|---|---|
 |trees/OG0000206_tree.txt|Arthropoda|paraphyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
-|trees/OG0000206_tree.txt|Insecta|monophyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
+|trees/OG0000206_tree.txt|Insecta|paraphyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
 |trees/OG0000206_tree.txt|Diptera|paraphyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
 |trees/OG0000215_tree.txt|Arthropoda|paraphyletic|2|"['Caenorhabditis_elegans', 'Paramacrobiotus_metropolitanus']"|
 |trees/OG0000215_tree.txt|Insecta|monophyletic|0|[]|
