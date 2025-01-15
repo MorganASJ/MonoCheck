@@ -8,7 +8,7 @@ This tool is particularly useful for researchers studying phylogenetics who need
 
 MonoCheck is run from the terminal and can be used to quickly determine monophyly or produce a csv report for more complex requests.
 
-    $ monocheck.py [-h] -clade CLADE [CLADE ...] -outgroup OUTGROUP -email EMAIL [-taxonomy TAXONOMY] [-out OUT] [--showtree | --no-showtree] [--resettaxonomy | --no-resettaxonomy] tree
+    $ python3 monocheck.py [-h] -clade CLADE [CLADE ...] -outgroup OUTGROUP -email EMAIL [-taxonomy TAXONOMY] [-out OUT] [--showtree | --no-showtree] [--resettaxonomy | --no-resettaxonomy] tree
     
 **Positional Arguments:**
 
@@ -35,7 +35,7 @@ MonoCheck is run from the terminal and can be used to quickly determine monophyl
 
 # Requirements
 
-MonoCheck requires **BioPython** for the Entrez libraries, **Pandas** for data frame management, and **ete3** for phylogenetic tree data structures and functions.
+MonoCheck requires **BioPython** for the Entrez libraries, **Pandas** for data frame management, and **ete3** for phylogenetic tree data structures and functions. MonoCheck is built for use with python 3.9+.
 
 These packages can be installed by running the following:
 
@@ -105,6 +105,7 @@ If we provide the `--showtree` flag we will get a print out of the rooted tree:
           \-|
              \-Caenorhabditis_elegans_sc
 
+In this tree you will see that Daphnia, Tribolium, Drosophila, and Aedes are contained within a distinct clade. As these are the only taxa within the tree with membership of Insecta, we can say that within this phylogeny Insecta is monophyletic.
 
  ### Running MonoCheck on multiple trees
 
